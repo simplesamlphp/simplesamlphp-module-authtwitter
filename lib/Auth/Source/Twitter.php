@@ -12,7 +12,7 @@ if (file_exists($default)) {
 } else if (file_exists($travis)) {
     require_once($travis);
 } else {
-    throw \Exception("Missing dependency");
+    throw new \Exception("Missing dependency");
 }
 
 /**
