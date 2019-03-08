@@ -6,7 +6,7 @@ use Webmozart\Assert\Assert;
 
 $default = dirname(dirname(dirname(dirname(dirname(__FILE__))))).'/oauth/libextinc/OAuth.php';
 $travis = dirname(dirname(dirname(dirname(__FILE__)))).'/vendor/simplesamlphp/simplesamlphp/modules/oauth/libextinc/OAuth.php';
-$codecov = dirname(dirname(dirname(dirname(__FILE__)))).'/simplesamlphp-module-oauth/libextinc/OAuth.php';
+$codecov = dirname(dirname(__FILE__)).'/simplesamlphp/simplesamlphp/libextinc/OAuth.php';
 
 if (file_exists($default)) {
     require_once($default);
