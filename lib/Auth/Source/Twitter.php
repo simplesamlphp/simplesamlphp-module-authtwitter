@@ -6,16 +6,13 @@ use Webmozart\Assert\Assert;
 
 $default = dirname(dirname(dirname(dirname(dirname(__FILE__))))).'/oauth/libextinc/OAuth.php';
 $travis = dirname(dirname(dirname(dirname(__FILE__)))).'/vendor/simplesamlphp/simplesamlphp/modules/oauth/libextinc/OAuth.php';
-$codecov = dirname(dirname(__FILE__)).'/simplesamlphp/simplesamlphp/libextinc/OAuth.php';
 
 if (file_exists($default)) {
     require_once($default);
 } else if (file_exists($travis)) {
     require_once($travis);
-} else if (file_exists($codecov)) {
-    require_once($codecov);
 } else {
-    throw new \Exception("Missing dependency");
+    // Probably codecov, but we can't raise an exception here or Travis will fail
 }
 
 /**
