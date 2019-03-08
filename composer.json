@@ -1,0 +1,47 @@
+{
+    "name": "simplesamlphp/simplesamlphp-module-authtwitter",
+    "description": "A module that is able to perform authentication against Twitter",
+    "type": "simplesamlphp-module",
+    "keywords": ["simplesamlphp", "twitter"],
+    "license": "LGPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "Olav Morken",
+            "email": "olavmrk@gmail.com"
+        },
+        {
+            "name": "Tim van Dijen",
+            "email": "tvdijen@gmail.com"
+        }
+    ],
+    "config": {
+        "preferred-install": {
+            "simplesamlphp/simplesamlphp": "source",
+            "*": "dist"
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "SimpleSAML\\modules\\authtwitter\\": "lib/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\SimpleSAML\\modules\\authtwitter\\TestFiles\\": "tests/files",
+            "SimpleSAML\\Test\\Utils\\": "vendor/simplesamlphp/simplesamlphp/tests/Utils"
+        }
+    },
+    "require": {
+        "php": ">=5.5",
+        "simplesamlphp/composer-module-installer": "~1.0",
+        "webmozart/assert": "^1.4"
+    },
+    "require-dev": {
+        "simplesamlphp/simplesamlphp": "^1.17",
+        "phpunit/phpunit": "~4.8.35"
+    },
+    "support": {
+        "issues": "https://github.com/tvdijen/simplesamlphp-module-authtwitter/issues",
+        "source": "https://github.com/tvdijen/simplesamlphp-module-authtwitter"
+    }
+}
