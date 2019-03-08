@@ -4,7 +4,16 @@ namespace SimpleSAML\Module\authtwitter\Auth\Source;
 
 use Webmozart\Assert\Assert;
 
-require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))).'/oauth/libextinc/OAuth.php');
+$default = dirname(dirname(dirname(dirname(dirname(__FILE__))))).'/oauth/libextinc/OAuth.php';
+$travis = dirname(dirname(dirname(dirname(dirname(__FILE__))))).'/vendor/simplesamlphp/simplesamlphp/modules/oauth/libextinc/OAuth.php';
+
+if (file_exists($default)) {
+    require_once($default);
+} else if (file_exists($travis)) {
+    require_once($travis);
+} else {
+    throw \Exception("Missing dependency");
+}
 
 /**
  * Authenticate using Twitter.
