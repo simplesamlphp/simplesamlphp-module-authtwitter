@@ -37,7 +37,8 @@
     },
     "require-dev": {
         "simplesamlphp/simplesamlphp": "^1.17",
-        "phpunit/phpunit": "~4.8.35"
+        "phpunit/phpunit": "~4.8.35",
+        "webmozart/assert": "<1.7"
     },
     "support": {
         "issues": "https://github.com/tvdijen/simplesamlphp-module-authtwitter/issues",
