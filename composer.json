@@ -3,7 +3,7 @@
     "description": "A module that is able to perform authentication against Twitter",
     "type": "simplesamlphp-module",
     "keywords": ["simplesamlphp", "twitter"],
-    "license": "LGPL-3.0-or-later",
+    "license": "LGPL-2.1-or-later",
     "authors": [
         {
             "name": "Olav Morken",
