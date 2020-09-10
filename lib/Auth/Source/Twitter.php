@@ -26,7 +26,6 @@ if (file_exists($default)) {
 /**
  * Authenticate using Twitter.
  *
- * @author Andreas Åkre Solberg, UNINETT AS.
  * @package SimpleSAMLphp
  */
 
