@@ -88,7 +88,6 @@ class Twitter extends Auth\Source
      * Log-in using Twitter platform
      *
      * @param array &$state  Information about the current authentication.
-     * @return void
      */
     public function authenticate(array &$state): void
     {
@@ -121,7 +120,6 @@ class Twitter extends Auth\Source
 
     /**
      * @param array &$state
-     * @return void
      */
     public function finalStep(array &$state): void
     {
