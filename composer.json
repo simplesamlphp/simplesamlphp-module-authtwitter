@@ -31,14 +31,14 @@
         }
     },
     "require": {
-        "php": ">=7.2",
-        "simplesamlphp/composer-module-installer": "~1.0",
+        "php": ">=7.4",
+        "simplesamlphp/assert": "^0.1.0",
+        "simplesamlphp/composer-module-installer": "~1.1",
         "simplesamlphp/simplesamlphp": "dev-master",
-        "simplesamlphp/simplesamlphp-module-oauth": "~1.0",
-        "webmozart/assert": "^1.4"
+        "simplesamlphp/simplesamlphp-module-oauth": "~1.0"
     },
     "require-dev": {
-        "simplesamlphp/simplesamlphp-test-framework": "^0.1.0"
+        "simplesamlphp/simplesamlphp-test-framework": "^1.0.4"
     },
     "support": {
         "issues": "https://github.com/simplesamlphp/simplesamlphp-module-authtwitter/issues",
