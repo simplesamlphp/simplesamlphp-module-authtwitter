@@ -168,7 +168,7 @@ class Twitter extends Auth\Source
         $attributes = [];
         foreach ($userdata as $key => $value) {
             if (is_string($value)) {
-                $attributes['twitter.' . $key] = [(string) $value];
+                $attributes['twitter.' . $key] = [$value];
             }
         }
 
