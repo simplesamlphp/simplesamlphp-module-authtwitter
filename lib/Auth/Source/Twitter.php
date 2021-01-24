@@ -2,6 +2,7 @@
 
 namespace SimpleSAML\Module\authtwitter\Auth\Source;
 
+use SimpleSAML\Assert\Assert;
 use SimpleSAML\Auth;
 use SimpleSAML\Configuration;
 use SimpleSAML\Error;
@@ -9,7 +10,6 @@ use SimpleSAML\Logger;
 use SimpleSAML\Module;
 use SimpleSAML\Module\oauth\Consumer;
 use SimpleSAML\Utils;
-use Webmozart\Assert\Assert;
 
 $base = dirname(dirname(dirname(dirname(__FILE__))));
 $default = dirname($base) . '/oauth/libextinc/OAuth.php';
