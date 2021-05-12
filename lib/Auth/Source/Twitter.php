@@ -41,25 +41,17 @@ class Twitter extends Auth\Source
      */
     public const AUTHID = 'twitter:AuthId';
 
-    /**
-     * @var string
-     */
-    private $key;
+    /** @var string */
+    private string $key;
 
-    /**
-     * @var string
-     */
-    private $secret;
+    /** @var string */
+    private string $secret;
 
-    /**
-     * @var bool
-     */
-    private $force_login;
+    /** @var bool */
+    private bool $force_login;
 
-    /**
-     * @var bool
-     */
-    private $include_email;
+    /** @var bool */
+    private bool $include_email;
 
     /**
      * Constructor for this authentication source.
