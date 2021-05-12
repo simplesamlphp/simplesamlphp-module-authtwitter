@@ -104,7 +104,8 @@ class Twitter extends Auth\Source
         // Authorize the request token
         $url = 'https://api.twitter.com/oauth/authenticate';
         if ($this->force_login) {
-            $url = Utils\HTTP::addURLParameters($url, ['force_login' => 'true']);
+            $httpUtils = new Utils\HTTP();
+            $url = $httpUtils->addURLParameters($url, ['force_login' => 'true']);
         }
         $consumer->getAuthorizeRequest($url, $requestToken);
     }
