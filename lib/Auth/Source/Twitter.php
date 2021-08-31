@@ -2,6 +2,7 @@
 
 namespace SimpleSAML\Module\authtwitter\Auth\Source;
 
+use League\OAuth1\Client\Server\Twitter as TwitterSource;
 use SimpleSAML\Assert\Assert;
 use SimpleSAML\Auth;
 use SimpleSAML\Configuration;
@@ -10,23 +11,12 @@ use SimpleSAML\Logger;
 use SimpleSAML\Module;
 use SimpleSAML\Module\oauth\Consumer;
 use SimpleSAML\Utils;
-
-$base = dirname(dirname(dirname(dirname(__FILE__))));
-$default = dirname($base) . '/oauth/libextinc/OAuth.php';
-$travis = $base . '/vendor/simplesamlphp/simplesamlphp/modules/oauth/libextinc/OAuth.php';
-
-if (file_exists($default)) {
-    require_once($default);
-} elseif (file_exists($travis)) {
-    require_once($travis);
-} else {
-    // Probably codecov, but we can't raise an exception here or Travis will fail
-}
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Authenticate using Twitter.
  *
- * @package SimpleSAMLphp
+ * @package simplesamlphp/simplesamlphp-module-authtwitter
  */
 
 class Twitter extends Auth\Source
@@ -86,88 +76,65 @@ class Twitter extends Auth\Source
         // We are going to need the authId in order to retrieve this authentication source later
         $state[self::AUTHID] = $this->authId;
 
-        $stateID = Auth\State::saveState($state, self::STAGE_INIT);
+        $stateId = Auth\State::saveState($state, self::STAGE_INIT);
 
-        $consumer = new Consumer($this->key, $this->secret);
-        // Get the request token
-        $linkback = Module::getModuleURL('authtwitter/linkback.php', ['AuthState' => $stateID]);
-        $requestToken = $consumer->getRequestToken(
-            'https://api.twitter.com/oauth/request_token',
-            ['oauth_callback' => $linkback]
+        $server = new League\OAuth1\Client\Server\Twitter(
+            [
+                'identifier' => $this->key,
+                'secret' => $this->secret,
+                'callback_uri' => Module::getModuleURL('authtwitter/linkback.php', ['AuthState' => $stateId])
+            ]
         );
-        Logger::debug("Got a request token from the OAuth service provider [" .
-            $requestToken->key . "] with the secret [" . $requestToken->secret . "]");
 
-        $state['authtwitter:authdata:requestToken'] = $requestToken;
+        // First part of OAuth 1.0 authentication is retrieving temporary credentials.
+        // These identify you as a client to the server.
+        $temporaryCredentials = $server->getTemporaryCredentials();
+
+        $state['authtwitter:authdata:requestToken'] = serialize($temporaryCredentials);
         Auth\State::saveState($state, self::STAGE_INIT);
 
-        // Authorize the request token
-        $url = 'https://api.twitter.com/oauth/authenticate';
-        if ($this->force_login) {
-            $httpUtils = new Utils\HTTP();
-            $url = $httpUtils->addURLParameters($url, ['force_login' => 'true']);
-        }
-        $consumer->getAuthorizeRequest($url, $requestToken);
+        $server->authorize($temporaryCredentials);
     }
 
 
     /**
      * @param array &$state
      */
-    public function finalStep(array &$state): void
+    public function finalStep(array &$state, Request $request): void
     {
         $requestToken = $state['authtwitter:authdata:requestToken'];
-        $parameters = [];
 
-        if (!isset($_REQUEST['oauth_token'])) {
+        if (!$request->request->has('oauth_token')) {
             throw new Error\BadRequest("Missing oauth_token parameter.");
         }
-        if ($requestToken->key !== (string) $_REQUEST['oauth_token']) {
+
+        if (!$requestToken->key !== $request->get('oauth_token')) {
             throw new Error\BadRequest("Invalid oauth_token parameter.");
         }
 
-        if (!isset($_REQUEST['oauth_verifier'])) {
+        if (!$request->request->has('oauth_verifier')) {
             throw new Error\BadRequest("Missing oauth_verifier parameter.");
         }
-        $parameters['oauth_verifier'] = (string) $_REQUEST['oauth_verifier'];
 
-        $consumer = new Consumer($this->key, $this->secret);
-
-        Logger::debug("oauth: Using this request token [" .
-            $requestToken->key . "] with the secret [" . $requestToken->secret . "]");
-
-        // Replace the request token with an access token
-        $accessToken = $consumer->getAccessToken(
-            'https://api.twitter.com/oauth/access_token',
-            $requestToken,
-            $parameters
+        $server = new TwitterSource(
+            [
+                'identifier' => $this->key,
+                'secret' => $this->secret,
+            ]
         );
-        Logger::debug("Got an access token from the OAuth service provider [" .
-            $accessToken->key . "] with the secret [" . $accessToken->secret . "]");
 
-        $verify_credentials_url = 'https://api.twitter.com/1.1/account/verify_credentials.json';
-        if ($this->include_email) {
-            $verify_credentials_url = $verify_credentials_url . '?include_email=true';
-        }
-        $userdata = $consumer->getUserInfo($verify_credentials_url, $accessToken);
+        $tokenCredentials = $server->getTokenCredentials(
+            unserialize($requestToken),
+            $request->get('oauth_token'),
+            $request->get('oauth_verifier')
+        );
 
-        if (!isset($userdata['id_str']) || !isset($userdata['screen_name'])) {
-            throw new Error\AuthSource(
-                $this->authId,
-                'Authentication error: id_str and screen_name not set.'
-            );
-        }
+        $state['token_credentials'] = serialize($tokenCredentials);
+        $userdata = $server->getUserDetails($tokenCredentials);
 
-        $attributes = [];
-        foreach ($userdata as $key => $value) {
-            if (is_string($value)) {
-                $attributes['twitter.' . $key] = [$value];
-            }
-        }
-
-        $attributes['twitter_at_screen_name'] = ['@' . $userdata['screen_name']];
-        $attributes['twitter_screen_n_realm'] = [$userdata['screen_name'] . '@twitter.com'];
-        $attributes['twitter_targetedID'] = ['http://twitter.com!' . $userdata['id_str']];
+        $attributes['twitter_at_screen_name'] = ['@' . $userdata>uid];
+        $attributes['twitter_screen_n_realm'] = [$userdata->uid . '@twitter.com'];
+        $attributes['twitter_targetedID'] = ['http://twitter.com!' . $userdata->uid];
 
         $state['Attributes'] = $attributes;
     }

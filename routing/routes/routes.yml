@@ -1,0 +1,7 @@
+authtwitter-linkback:
+    path:       /linkback
+    defaults:   { _controller: 'SimpleSAML\Module\authtwitter\Controller\Twitter::linkback' }
+
+authtwitter-linkback-legacy:
+    path:       /linkback.php
+    defaults:   { _controller: 'SimpleSAML\Module\authtwitter\Controller\Twitter::linkback' }
