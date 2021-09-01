@@ -2,7 +2,7 @@
 
 namespace SimpleSAML\Module\authtwitter\Auth\Source;
 
-use League\OAuth1\Client\Server\Twitter as TwitterSource;
+use League\OAuth1\Client\Server\Twitter as TwitterServer;
 use SimpleSAML\Assert\Assert;
 use SimpleSAML\Auth;
 use SimpleSAML\Configuration;
@@ -37,6 +37,9 @@ class Twitter extends Auth\Source
     /** @var string */
     private string $secret;
 
+    /** @var string */
+    private string $scope;
+
     /** @var bool */
     private bool $force_login;
 
@@ -61,8 +64,9 @@ class Twitter extends Auth\Source
 
         $this->key = $configObject->getString('key');
         $this->secret = $configObject->getString('secret');
-        $this->force_login = $configObject->getBoolean('force_login', false);
-        $this->include_email = $configObject->getBoolean('include_email', false);
+        $this->scope = $configObject->getString('scope');
+//        $this->force_login = $configObject->getBoolean('force_login', false);
+//        $this->include_email = $configObject->getBoolean('include_email', false);
     }
 
 
@@ -78,11 +82,12 @@ class Twitter extends Auth\Source
 
         $stateId = Auth\State::saveState($state, self::STAGE_INIT);
 
-        $server = new League\OAuth1\Client\Server\Twitter(
+        $server = new TwitterServer(
             [
                 'identifier' => $this->key,
                 'secret' => $this->secret,
-                'callback_uri' => Module::getModuleURL('authtwitter/linkback.php', ['AuthState' => $stateId])
+                'callback_uri' => Module::getModuleURL('authtwitter/linkback.php', ['AuthState' => $stateId]),
+                'scope' => $this->scope,
             ]
         );
 
