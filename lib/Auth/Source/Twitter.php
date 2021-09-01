@@ -137,7 +137,7 @@ class Twitter extends Auth\Source
         $userdata = $server->getUserDetails($tokenCredentials);
 
         $attributes = [];
-        $attributes['twitter_at_screen_name'] = ['@' . $userdata>uid];
+        $attributes['twitter_at_screen_name'] = ['@' . $userdata->uid];
         $attributes['twitter_screen_n_realm'] = [$userdata->uid . '@twitter.com'];
         $attributes['twitter_targetedID'] = ['http://twitter.com!' . $userdata->uid];
 
