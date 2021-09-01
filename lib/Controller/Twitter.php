@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SimpleSAML\Module\authtwitter\Controller;
 
+use Exception;
 use SimpleSAML\Auth;
 use SimpleSAML\Configuration;
 use SimpleSAML\Error;
@@ -92,6 +93,6 @@ class Twitter
             );
         }
 
-        return RunnableResponse([Auth\Source::class, 'completeAuth'], [$state]);
+        return new RunnableResponse([Auth\Source::class, 'completeAuth'], [$state]);
     }
 }
