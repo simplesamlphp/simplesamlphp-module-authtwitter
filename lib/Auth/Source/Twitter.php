@@ -81,11 +81,15 @@ class Twitter extends Auth\Source
 
         $stateId = Auth\State::saveState($state, self::STAGE_INIT);
 
+        $httpUtils = new Utils\HTTP();
         $server = new TwitterServer(
             [
                 'identifier' => $this->key,
                 'secret' => $this->secret,
-                'callback_uri' => Module::getModuleURL('authtwitter/linkback.php', ['AuthState' => $stateId]),
+                'callback_uri' => $httpUtils->addURLParameters(
+                    Module::getModuleURL('authtwitter/linkback.php'),
+                    ['AuthState' => $stateId]
+                ),
                 'scope' => $this->scope,
             ]
         );
