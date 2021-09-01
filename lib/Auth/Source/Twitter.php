@@ -9,7 +9,6 @@ use SimpleSAML\Configuration;
 use SimpleSAML\Error;
 use SimpleSAML\Logger;
 use SimpleSAML\Module;
-use SimpleSAML\Module\oauth\Consumer;
 use SimpleSAML\Utils;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -41,10 +40,10 @@ class Twitter extends Auth\Source
     private string $scope;
 
     /** @var bool */
-    private bool $force_login;
+//    private bool $force_login;
 
     /** @var bool */
-    private bool $include_email;
+//    private bool $include_email;
 
     /**
      * Constructor for this authentication source.
@@ -121,7 +120,7 @@ class Twitter extends Auth\Source
             throw new Error\BadRequest("Missing oauth_verifier parameter.");
         }
 
-        $server = new TwitterSource(
+        $server = new TwitterServer(
             [
                 'identifier' => $this->key,
                 'secret' => $this->secret,
