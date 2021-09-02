@@ -42,9 +42,6 @@ class Twitter extends Auth\Source
     /** @var bool */
     private bool $force_login;
 
-    /** @var bool */
-//    private bool $include_email;
-
     /**
      * Constructor for this authentication source.
      *
@@ -65,7 +62,6 @@ class Twitter extends Auth\Source
         $this->secret = $configObject->getString('secret');
         $this->scope = $configObject->getString('scope');
         $this->force_login = $configObject->getBoolean('force_login', false);
-//        $this->include_email = $configObject->getBoolean('include_email', false);
     }
 
 
@@ -96,7 +92,8 @@ class Twitter extends Auth\Source
             [
                 'identifier' => $this->key,
                 'secret' => $this->secret,
-                'callback_uri' => Module::getModuleURL('authtwitter/linkback.php') . '?AuthState=' . $stateId,
+                'callback_uri' => Module::getModuleURL('authtwitter/linkback.php')
+                    . '?AuthState=' . $stateId . '&force_login=' . strval($this->force_login),
             ]
         );
 
@@ -150,8 +147,8 @@ class Twitter extends Auth\Source
         $userdata = $server->getUserDetails($tokenCredentials);
 
         $attributes = [];
-        $attributes['twitter_at_screen_name'] = ['@' . $userdata->uid];
-        $attributes['twitter_screen_n_realm'] = [$userdata->uid . '@twitter.com'];
+        $attributes['twitter_at_screen_name'] = ['@' . $userdata->nickname];
+        $attributes['twitter_screen_n_realm'] = [$userdata->nickname . '@twitter.com'];
         $attributes['twitter_targetedID'] = ['http://twitter.com!' . $userdata->uid];
 
         $state['Attributes'] = $attributes;
