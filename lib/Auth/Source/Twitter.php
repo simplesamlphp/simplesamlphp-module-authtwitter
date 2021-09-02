@@ -23,7 +23,7 @@ class Twitter extends Auth\Source
     /**
      * The string used to identify our states.
      */
-    public const STAGE_INIT = 'twitter:init';
+    public const STAGE_TEMP = 'twitter:temp';
 
     /**
      * The key of the AuthId field in the state.
@@ -76,21 +76,27 @@ class Twitter extends Auth\Source
      */
     public function authenticate(array &$state): void
     {
+        $this->temporaryCredentials($state);
+    }
+
+
+    /**
+     * Retrieve temporary credentials
+     *
+     * @param array &$state  Information about the current authentication.
+     */
+    private function temporaryCredentials(array &$state): void
+    {
         // We are going to need the authId in order to retrieve this authentication source later
         $state[self::AUTHID] = $this->authId;
 
-        $stateId = Auth\State::saveState($state, self::STAGE_INIT);
+        $stateId = base64_encode(Auth\State::saveState($state, self::STAGE_TEMP));
 
-        $httpUtils = new Utils\HTTP();
         $server = new TwitterServer(
             [
                 'identifier' => $this->key,
                 'secret' => $this->secret,
-                'callback_uri' => $httpUtils->addURLParameters(
-                    Module::getModuleURL('authtwitter/linkback.php'),
-                    ['AuthState' => $stateId]
-                ),
-                'scope' => $this->scope,
+                'callback_uri' => Module::getModuleURL('authtwitter/linkback.php') . '?AuthState=' . $stateId,
             ]
         );
 
@@ -99,9 +105,10 @@ class Twitter extends Auth\Source
         $temporaryCredentials = $server->getTemporaryCredentials();
 
         $state['authtwitter:authdata:requestToken'] = serialize($temporaryCredentials);
-        Auth\State::saveState($state, self::STAGE_INIT);
+        Auth\State::saveState($state, self::STAGE_TEMP);
 
         $server->authorize($temporaryCredentials);
+        exit;
     }
 
 
@@ -110,17 +117,19 @@ class Twitter extends Auth\Source
      */
     public function finalStep(array &$state, Request $request): void
     {
-        $requestToken = $state['authtwitter:authdata:requestToken'];
+        $requestToken = unserialize($state['authtwitter:authdata:requestToken']);
 
-        if (!$request->request->has('oauth_token')) {
+        $oauth_token = $request->get('oauth_token');
+        if ($oauth_token === null) {
             throw new Error\BadRequest("Missing oauth_token parameter.");
         }
 
-        if (!$requestToken->key !== $request->get('oauth_token')) {
+        if ($requestToken->getIdentifier() !== $oauth_token) {
             throw new Error\BadRequest("Invalid oauth_token parameter.");
         }
 
-        if (!$request->request->has('oauth_verifier')) {
+        $oauth_verifier = $request->get('oauth_verifier');
+        if ($oauth_verifier === null) {
             throw new Error\BadRequest("Missing oauth_verifier parameter.");
         }
 
@@ -132,14 +141,15 @@ class Twitter extends Auth\Source
         );
 
         $tokenCredentials = $server->getTokenCredentials(
-            unserialize($requestToken),
+            $requestToken,
             $request->get('oauth_token'),
             $request->get('oauth_verifier')
         );
 
         $state['token_credentials'] = serialize($tokenCredentials);
         $userdata = $server->getUserDetails($tokenCredentials);
-
+var_dump($userdata);
+exit;
         $attributes = [];
         $attributes['twitter_at_screen_name'] = ['@' . $userdata->uid];
         $attributes['twitter_screen_n_realm'] = [$userdata->uid . '@twitter.com'];

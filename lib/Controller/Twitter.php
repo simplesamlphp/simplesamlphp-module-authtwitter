@@ -61,7 +61,7 @@ class Twitter
             throw new Error\BadRequest('Missing state parameter on twitter linkback endpoint.');
         }
 
-        $state = Auth\State::loadState($authState, TwitterSource::STAGE_INIT);
+        $state = Auth\State::loadState(base64_decode($authState), TwitterSource::STAGE_TEMP);
 
         // Find authentication source
         if (is_null($state) || !array_key_exists(TwitterSource::AUTHID, $state)) {
@@ -80,9 +80,6 @@ class Twitter
         }
 
         try {
-            if ($request->request->has('denied')) {
-                throw new Error\UserAborted();
-            }
             $source->finalStep($state, $request);
         } catch (Error\Exception $e) {
             Auth\State::throwException($state, $e);
@@ -93,6 +90,6 @@ class Twitter
             );
         }
 
-        return new RunnableResponse([Auth\Source::class, 'completeAuth'], [$state]);
+        return new RunnableResponse([Auth\Source::class, 'completeAuth'], [&$state]);
     }
 }
