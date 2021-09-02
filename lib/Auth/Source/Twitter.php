@@ -40,7 +40,7 @@ class Twitter extends Auth\Source
     private string $scope;
 
     /** @var bool */
-//    private bool $force_login;
+    private bool $force_login;
 
     /** @var bool */
 //    private bool $include_email;
@@ -64,7 +64,7 @@ class Twitter extends Auth\Source
         $this->key = $configObject->getString('key');
         $this->secret = $configObject->getString('secret');
         $this->scope = $configObject->getString('scope');
-//        $this->force_login = $configObject->getBoolean('force_login', false);
+        $this->force_login = $configObject->getBoolean('force_login', false);
 //        $this->include_email = $configObject->getBoolean('include_email', false);
     }
 
@@ -148,8 +148,7 @@ class Twitter extends Auth\Source
 
         $state['token_credentials'] = serialize($tokenCredentials);
         $userdata = $server->getUserDetails($tokenCredentials);
-var_dump($userdata);
-exit;
+
         $attributes = [];
         $attributes['twitter_at_screen_name'] = ['@' . $userdata->uid];
         $attributes['twitter_screen_n_realm'] = [$userdata->uid . '@twitter.com'];
