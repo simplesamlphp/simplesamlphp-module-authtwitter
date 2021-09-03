@@ -152,13 +152,24 @@ class Twitter extends Auth\Source
         foreach ($userdata->getIterator() as $key => $value) {
             if (is_string($value)) {
                 $attributes['twitter.' . $key] = [$value];
-            } elseif (is_array($value) && in_array($key, ['extra', 'urls'])) {
-                foreach ($value as $_key => $_value) {
-                    $attributes['twitter.' . $_key] = [$_value];
-                }
             } else {
-                // Something we don't recognize - maybe the API has changed?
-                continue;
+                // Either the urls or the extra array
+            }
+        }
+
+        foreach ($userdata->urls as $key => $value) {
+            if (is_string($value)) {
+                $attributes['twitter.' . $key] = [$value];
+            } else {
+                // Something funky.. Maybe the API has changed?
+            }
+        }
+
+        foreach ($userdata->extra as $key => $value) {
+            if (is_string($value) || is_int($value)) {
+                $attributes['twitter.' . $key] = [strval($value)];
+            } else {
+                // Something funky.. Maybe the API has changed?
             }
         }
 
