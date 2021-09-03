@@ -152,18 +152,15 @@ class Twitter extends Auth\Source
         foreach ($userdata->getIterator() as $key => $value) {
             if (is_string($value)) {
                 $attributes['twitter.' . $key] = [$value];
+            } elseif (is_array($value) && in_array($key, ['extra', 'urls'])) {
+                foreach ($value as $_key => $_value) {
+                    $attributes['twitter.' . $_key] = [$_value];
+                }
+            } else {
+                // Something we don't recognize - maybe the API has changed?
+                continue;
             }
         }
-
-        foreach ($userdata->extra as $key => $value) {
-            if (is_string($value)) {
-                $attributes['twitter.' . $key] = [$value];
-            }
-        }
-
-        $attributes['twitter_at_screen_name'] = ['@' . $userdata->nickname];
-        $attributes['twitter_screen_n_realm'] = [$userdata->nickname . '@twitter.com'];
-        $attributes['twitter_targetedID'] = ['http://twitter.com!' . $userdata->uid];
 
         $state['Attributes'] = $attributes;
     }
