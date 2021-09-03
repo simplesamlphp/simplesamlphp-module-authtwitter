@@ -23,7 +23,7 @@ class Twitter extends Auth\Source
     /**
      * The string used to identify our states.
      */
-    public const STAGE_TEMP = 'twitter:temp';
+    public const STAGE_INIT = 'twitter:init';
 
     /**
      * The key of the AuthId field in the state.
@@ -86,7 +86,7 @@ class Twitter extends Auth\Source
         // We are going to need the authId in order to retrieve this authentication source later
         $state[self::AUTHID] = $this->authId;
 
-        $stateId = base64_encode(Auth\State::saveState($state, self::STAGE_TEMP));
+        $stateId = base64_encode(Auth\State::saveState($state, self::STAGE_INIT));
 
         $server = new TwitterServer(
             [
@@ -102,7 +102,7 @@ class Twitter extends Auth\Source
         $temporaryCredentials = $server->getTemporaryCredentials();
 
         $state['authtwitter:authdata:requestToken'] = serialize($temporaryCredentials);
-        Auth\State::saveState($state, self::STAGE_TEMP);
+        Auth\State::saveState($state, self::STAGE_INIT);
 
         $server->authorize($temporaryCredentials);
         exit;
@@ -111,6 +111,7 @@ class Twitter extends Auth\Source
 
     /**
      * @param array &$state
+     * @param \Symfony\Component\HttpFoundation\Request $request
      */
     public function finalStep(array &$state, Request $request): void
     {

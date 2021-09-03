@@ -61,7 +61,7 @@ class Twitter
             throw new Error\BadRequest('Missing state parameter on twitter linkback endpoint.');
         }
 
-        $state = Auth\State::loadState(base64_decode($authState), TwitterSource::STAGE_TEMP);
+        $state = Auth\State::loadState(base64_decode($authState), TwitterSource::STAGE_INIT);
 
         // Find authentication source
         if (is_null($state) || !array_key_exists(TwitterSource::AUTHID, $state)) {
