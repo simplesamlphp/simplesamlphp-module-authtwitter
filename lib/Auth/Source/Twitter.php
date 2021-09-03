@@ -92,7 +92,7 @@ class Twitter extends Auth\Source
             [
                 'identifier' => $this->key,
                 'secret' => $this->secret,
-                'callback_uri' => Module::getModuleURL('authtwitter/linkback.php')
+                'callback_uri' => Module::getModuleURL('authtwitter/linkback')
                     . '?AuthState=' . $stateId . '&force_login=' . strval($this->force_login),
                 'scope' => $this->scope,
             ]
