@@ -9,7 +9,7 @@ To get an API key and a secret, register the application at:
 
 Set the callback URL to be:
 
- * `http://sp.example.org/simplesaml/module.php/authtwitter/linkback.php`
+ * `http://sp.example.org/simplesaml/module.php/authtwitter/linkback`
 
 Replace `sp.example.org` with your hostname.
 
@@ -21,15 +21,7 @@ On the SimpleSAMLphp frontpage, go to the *Authentication* tab, and use the link
 
 Then choose the *twitter* authentication source.
 
-Expected behaviour would then be that you are sent to twitter, and asked to login:
-
-![](http://clippings.erlang.no/ZZ2EE26BF6.jpg)
-
-The first time a user uses your application to login, he/she is asked for consent:
-
-![](http://clippings.erlang.no/ZZ6B18B5D9.jpg)
-
-You will then be authenticated in SimpleSAMLphp and see an attribute set similar to this:
-
-![](http://clippings.erlang.no/ZZ74A6835E.jpg)
+Expected behaviour would then be that you are sent to twitter, and asked to login.
+The first time a user uses your application to login, he/she is asked for consent.
+You will then be authenticated in SimpleSAMLphp and see an attribute set with data delivered by Twitter.
 
