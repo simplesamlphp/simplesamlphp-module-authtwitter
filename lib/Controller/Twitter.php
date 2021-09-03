@@ -79,24 +79,8 @@ class Twitter
             );
         }
 
-        $requestToken = unserialize($state['authtwitter:authdata:requestToken']);
-
-        $oauth_token = $request->get('oauth_token');
-        if ($oauth_token === null) {
-            throw new Error\BadRequest("Missing oauth_token parameter.");
-        }
-
-        if ($requestToken->getIdentifier() !== $oauth_token) {
-            throw new Error\BadRequest("Invalid oauth_token parameter.");
-        }
-
-        $oauth_verifier = $request->get('oauth_verifier');
-        if ($oauth_verifier === null) {
-            throw new Error\BadRequest("Missing oauth_verifier parameter.");
-        }
-
         try {
-            $source->finalStep($requestToken, $oauth_token, $oauth_verifier);
+            $source->finalStep($state, $request);
         } catch (Error\Exception $e) {
             Auth\State::throwException($state, $e);
         } catch (Exception $e) {
