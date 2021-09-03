@@ -158,22 +158,6 @@ class Twitter extends Auth\Source
             }
         }
 
-        foreach ($userdata->urls as $key => $value) {
-            if (is_string($value)) {
-                $attributes['twitter.' . $key] = [$value];
-            } else {
-                // Something funky.. Maybe the API has changed?
-            }
-        }
-
-        foreach ($userdata->extra as $key => $value) {
-            if (is_string($value) || is_int($value)) {
-                $attributes['twitter.' . $key] = [strval($value)];
-            } else {
-                // Something funky.. Maybe the API has changed?
-            }
-        }
-
         $state['Attributes'] = $attributes;
     }
 }
