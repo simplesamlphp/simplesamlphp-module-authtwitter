@@ -151,7 +151,7 @@ class Twitter extends Auth\Source
         $attributes = [];
 
         foreach ($userdata->getIterator() as $key => $value) {
-            if (is_string($value)) {
+            if (is_string($value) && (strlen($value) > 0)) {
                 $attributes['twitter.' . $key] = [$value];
             } else {
                 // Either the urls or the extra array
