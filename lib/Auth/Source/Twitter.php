@@ -60,7 +60,7 @@ class Twitter extends Auth\Source
 
         $this->key = $configObject->getString('key');
         $this->secret = $configObject->getString('secret');
-        $this->scope = $configObject->getString('scope');
+        $this->scope = $configObject->getString('scope', null);
         $this->force_login = $configObject->getBoolean('force_login', false);
     }
 
@@ -94,6 +94,7 @@ class Twitter extends Auth\Source
                 'secret' => $this->secret,
                 'callback_uri' => Module::getModuleURL('authtwitter/linkback.php')
                     . '?AuthState=' . $stateId . '&force_login=' . strval($this->force_login),
+                'scope' => $this->scope,
             ]
         );
 
