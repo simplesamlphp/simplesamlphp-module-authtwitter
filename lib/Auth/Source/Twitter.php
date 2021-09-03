@@ -147,6 +147,13 @@ class Twitter extends Auth\Source
         $userdata = $server->getUserDetails($tokenCredentials);
 
         $attributes = [];
+
+        foreach ($userdata->getIterator() as $key => $value) {
+            if (is_string($value)) {
+                $attributes['twitter.' . $key] = [$value];
+            }
+        }
+
         $attributes['twitter_at_screen_name'] = ['@' . $userdata->nickname];
         $attributes['twitter_screen_n_realm'] = [$userdata->nickname . '@twitter.com'];
         $attributes['twitter_targetedID'] = ['http://twitter.com!' . $userdata->uid];
