@@ -6,10 +6,6 @@
     "license": "LGPL-2.1-or-later",
     "authors": [
         {
-            "name": "Olav Morken",
-            "email": "olavmrk@gmail.com"
-        },
-        {
             "name": "Tim van Dijen",
             "email": "tvdijen@gmail.com"
         }
@@ -33,10 +29,10 @@
     "require": {
         "php": ">=7.4 || ^8.0",
 
+        "league/oauth1-client": "~1.10.0",
         "simplesamlphp/assert": "^0.2.7",
-        "simplesamlphp/composer-module-installer": "~1.1",
-        "simplesamlphp/simplesamlphp": "dev-master",
-        "simplesamlphp/simplesamlphp-module-oauth": "~1.0"
+        "simplesamlphp/composer-module-installer": "^1.1",
+        "simplesamlphp/simplesamlphp": "dev-master"
     },
     "require-dev": {
         "simplesamlphp/simplesamlphp-test-framework": "^1.1.0"
