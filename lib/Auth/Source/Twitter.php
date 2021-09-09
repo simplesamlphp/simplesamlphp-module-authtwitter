@@ -2,31 +2,20 @@
 
 namespace SimpleSAML\Module\authtwitter\Auth\Source;
 
+use League\OAuth1\Client\Server\Twitter as TwitterServer;
 use SimpleSAML\Assert\Assert;
 use SimpleSAML\Auth;
 use SimpleSAML\Configuration;
 use SimpleSAML\Error;
 use SimpleSAML\Logger;
 use SimpleSAML\Module;
-use SimpleSAML\Module\oauth\Consumer;
 use SimpleSAML\Utils;
-
-$base = dirname(dirname(dirname(dirname(__FILE__))));
-$default = dirname($base) . '/oauth/libextinc/OAuth.php';
-$travis = $base . '/vendor/simplesamlphp/simplesamlphp/modules/oauth/libextinc/OAuth.php';
-
-if (file_exists($default)) {
-    require_once($default);
-} elseif (file_exists($travis)) {
-    require_once($travis);
-} else {
-    // Probably codecov, but we can't raise an exception here or Travis will fail
-}
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Authenticate using Twitter.
  *
- * @package SimpleSAMLphp
+ * @package simplesamlphp/simplesamlphp-module-authtwitter
  */
 
 class Twitter extends Auth\Source
@@ -47,11 +36,11 @@ class Twitter extends Auth\Source
     /** @var string */
     private string $secret;
 
-    /** @var bool */
-    private bool $force_login;
+    /** @var string */
+    private string $scope;
 
     /** @var bool */
-    private bool $include_email;
+    private bool $force_login;
 
     /**
      * Constructor for this authentication source.
@@ -71,8 +60,8 @@ class Twitter extends Auth\Source
 
         $this->key = $configObject->getString('key');
         $this->secret = $configObject->getString('secret');
+        $this->scope = $configObject->getString('scope', null);
         $this->force_login = $configObject->getBoolean('force_login', false);
-        $this->include_email = $configObject->getBoolean('include_email', false);
     }
 
 
@@ -83,91 +72,91 @@ class Twitter extends Auth\Source
      */
     public function authenticate(array &$state): void
     {
+        $this->temporaryCredentials($state);
+    }
+
+
+    /**
+     * Retrieve temporary credentials
+     *
+     * @param array &$state  Information about the current authentication.
+     */
+    private function temporaryCredentials(array &$state): void
+    {
         // We are going to need the authId in order to retrieve this authentication source later
         $state[self::AUTHID] = $this->authId;
 
-        $stateID = Auth\State::saveState($state, self::STAGE_INIT);
+        $stateId = base64_encode(Auth\State::saveState($state, self::STAGE_INIT));
 
-        $consumer = new Consumer($this->key, $this->secret);
-        // Get the request token
-        $linkback = Module::getModuleURL('authtwitter/linkback.php', ['AuthState' => $stateID]);
-        $requestToken = $consumer->getRequestToken(
-            'https://api.twitter.com/oauth/request_token',
-            ['oauth_callback' => $linkback]
+        $server = new TwitterServer(
+            [
+                'identifier' => $this->key,
+                'secret' => $this->secret,
+                'callback_uri' => Module::getModuleURL('authtwitter/linkback')
+                    . '?AuthState=' . $stateId . '&force_login=' . strval($this->force_login),
+                'scope' => $this->scope,
+            ]
         );
-        Logger::debug("Got a request token from the OAuth service provider [" .
-            $requestToken->key . "] with the secret [" . $requestToken->secret . "]");
 
-        $state['authtwitter:authdata:requestToken'] = $requestToken;
+        // First part of OAuth 1.0 authentication is retrieving temporary credentials.
+        // These identify you as a client to the server.
+        $temporaryCredentials = $server->getTemporaryCredentials();
+
+        $state['authtwitter:authdata:requestToken'] = serialize($temporaryCredentials);
         Auth\State::saveState($state, self::STAGE_INIT);
 
-        // Authorize the request token
-        $url = 'https://api.twitter.com/oauth/authenticate';
-        if ($this->force_login) {
-            $httpUtils = new Utils\HTTP();
-            $url = $httpUtils->addURLParameters($url, ['force_login' => 'true']);
-        }
-        $consumer->getAuthorizeRequest($url, $requestToken);
+        $server->authorize($temporaryCredentials);
+        exit;
     }
 
 
     /**
      * @param array &$state
+     * @param \Symfony\Component\HttpFoundation\Request $request
      */
-    public function finalStep(array &$state): void
+    public function finalStep(array &$state, Request $request): void
     {
-        $requestToken = $state['authtwitter:authdata:requestToken'];
-        $parameters = [];
+        $requestToken = unserialize($state['authtwitter:authdata:requestToken']);
 
-        if (!isset($_REQUEST['oauth_token'])) {
+        $oauth_token = $request->get('oauth_token');
+        if ($oauth_token === null) {
             throw new Error\BadRequest("Missing oauth_token parameter.");
         }
-        if ($requestToken->key !== (string) $_REQUEST['oauth_token']) {
+
+        if ($requestToken->getIdentifier() !== $oauth_token) {
             throw new Error\BadRequest("Invalid oauth_token parameter.");
         }
 
-        if (!isset($_REQUEST['oauth_verifier'])) {
+        $oauth_verifier = $request->get('oauth_verifier');
+        if ($oauth_verifier === null) {
             throw new Error\BadRequest("Missing oauth_verifier parameter.");
         }
-        $parameters['oauth_verifier'] = (string) $_REQUEST['oauth_verifier'];
 
-        $consumer = new Consumer($this->key, $this->secret);
-
-        Logger::debug("oauth: Using this request token [" .
-            $requestToken->key . "] with the secret [" . $requestToken->secret . "]");
-
-        // Replace the request token with an access token
-        $accessToken = $consumer->getAccessToken(
-            'https://api.twitter.com/oauth/access_token',
-            $requestToken,
-            $parameters
+        $server = new TwitterServer(
+            [
+                'identifier' => $this->key,
+                'secret' => $this->secret,
+            ]
         );
-        Logger::debug("Got an access token from the OAuth service provider [" .
-            $accessToken->key . "] with the secret [" . $accessToken->secret . "]");
 
-        $verify_credentials_url = 'https://api.twitter.com/1.1/account/verify_credentials.json';
-        if ($this->include_email) {
-            $verify_credentials_url = $verify_credentials_url . '?include_email=true';
-        }
-        $userdata = $consumer->getUserInfo($verify_credentials_url, $accessToken);
+        $tokenCredentials = $server->getTokenCredentials(
+            $requestToken,
+            $request->get('oauth_token'),
+            $request->get('oauth_verifier')
+        );
 
-        if (!isset($userdata['id_str']) || !isset($userdata['screen_name'])) {
-            throw new Error\AuthSource(
-                $this->authId,
-                'Authentication error: id_str and screen_name not set.'
-            );
-        }
+        $state['token_credentials'] = serialize($tokenCredentials);
+        $userdata = $server->getUserDetails($tokenCredentials);
 
         $attributes = [];
-        foreach ($userdata as $key => $value) {
-            if (is_string($value)) {
+
+        foreach ($userdata->getIterator() as $key => $value) {
+            if (is_string($value) && (strlen($value) > 0)) {
                 $attributes['twitter.' . $key] = [$value];
+            } else {
+                // Either the urls or the extra array
             }
         }
-
-        $attributes['twitter_at_screen_name'] = ['@' . $userdata['screen_name']];
-        $attributes['twitter_screen_n_realm'] = [$userdata['screen_name'] . '@twitter.com'];
-        $attributes['twitter_targetedID'] = ['http://twitter.com!' . $userdata['id_str']];
 
         $state['Attributes'] = $attributes;
     }
