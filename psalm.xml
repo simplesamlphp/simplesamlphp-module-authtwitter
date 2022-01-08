@@ -3,10 +3,11 @@
     name="SimpleSAMLphp Module for Twitter authentication"
     useDocblockTypes="true"
     totallyTyped="false"
+    hideExternalErrors="true"
 >
     <projectFiles>
         <directory name="lib" />
-        <directory name="www" />
+        <directory name="tests" />
     </projectFiles>
 
     <issueHandlers>
@@ -28,3 +29,4 @@
         <PossiblyUnusedMethod errorLevel="info" />
     </issueHandlers>
 </psalm>
+
