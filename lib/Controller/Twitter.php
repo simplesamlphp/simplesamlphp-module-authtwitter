@@ -56,7 +56,7 @@ class Twitter
      */
     public function linkback(Request $request)
     {
-        $authState = $request->get('AuthState');
+        $authState = $request->query->get('AuthState');
         if ($authState === null) {
             throw new Error\BadRequest('Missing state parameter on twitter linkback endpoint.');
         }

@@ -118,7 +118,7 @@ class Twitter extends Auth\Source
     {
         $requestToken = unserialize($state['authtwitter:authdata:requestToken']);
 
-        $oauth_token = $request->get('oauth_token');
+        $oauth_token = $request->query->get('oauth_token');
         if ($oauth_token === null) {
             throw new Error\BadRequest("Missing oauth_token parameter.");
         }
@@ -127,7 +127,7 @@ class Twitter extends Auth\Source
             throw new Error\BadRequest("Invalid oauth_token parameter.");
         }
 
-        $oauth_verifier = $request->get('oauth_verifier');
+        $oauth_verifier = $request->query->get('oauth_verifier');
         if ($oauth_verifier === null) {
             throw new Error\BadRequest("Missing oauth_verifier parameter.");
         }
@@ -141,8 +141,8 @@ class Twitter extends Auth\Source
 
         $tokenCredentials = $server->getTokenCredentials(
             $requestToken,
-            $request->get('oauth_token'),
-            $request->get('oauth_verifier')
+            $request->query->get('oauth_token'),
+            $request->query->get('oauth_verifier')
         );
 
         $state['token_credentials'] = serialize($tokenCredentials);
