@@ -60,8 +60,8 @@ class Twitter extends Auth\Source
 
         $this->key = $configObject->getString('key');
         $this->secret = $configObject->getString('secret');
-        $this->scope = $configObject->getString('scope', null);
-        $this->force_login = $configObject->getBoolean('force_login', false);
+        $this->scope = $configObject->getOptionalString('scope', null);
+        $this->force_login = $configObject->getOptionalBoolean('force_login', false);
     }
 
 
