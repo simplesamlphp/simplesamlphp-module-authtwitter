@@ -2,14 +2,17 @@
 
 To get an API key and a secret, register the application at:
 
-* <http://twitter.com/oauth_clients>
+* <https://developer.twitter.com/en/apps>
+
+The callback URI is
+`https://service.example.com/<baseurlpath>/module.php/authtwitter/linkback`.
 
 Now you have you configure the authsource in `authsources.php`.
 
 ```php
     // Twitter OAuth Authentication API.
     // Register your application to get an API key here:
-    //  http://twitter.com/oauth_clients
+    // https://developer.twitter.com/en/apps
     'twitter' => [
         'authtwitter:Twitter',
         'key' => 'key retrieved during registration of your app',
