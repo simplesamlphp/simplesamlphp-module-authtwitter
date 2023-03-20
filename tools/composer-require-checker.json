@@ -1,0 +1,15 @@
+{
+  "symbol-whitelist": [
+    "SimpleSAML\\Auth\\Source",
+    "SimpleSAML\\Auth\\State",
+    "SimpleSAML\\Configuration",
+    "SimpleSAML\\Error\\AuthSource",
+    "SimpleSAML\\Error\\BadRequest",
+    "SimpleSAML\\Error\\Exception",
+    "SimpleSAML\\HTTP\\RunnableResponse",
+    "SimpleSAML\\Logger",
+    "SimpleSAML\\Module",
+    "SimpleSAML\\Session",
+    "SimpleSAML\\Utils"
+  ]
+}

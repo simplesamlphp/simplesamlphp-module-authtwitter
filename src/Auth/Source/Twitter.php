@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SimpleSAML\Module\authtwitter\Auth\Source;
 
 use League\OAuth1\Client\Server\Twitter as TwitterServer;
