@@ -22,13 +22,6 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class Twitter
 {
-    /** @var \SimpleSAML\Configuration */
-    protected Configuration $config;
-
-    /** @var \SimpleSAML\Session */
-    protected Session $session;
-
-
     /**
      * Controller constructor.
      *
@@ -40,11 +33,9 @@ class Twitter
      * @throws \Exception
      */
     public function __construct(
-        Configuration $config,
-        Session $session
+        protected Configuration $config,
+        protected Session $session
     ) {
-        $this->config = $config;
-        $this->session = $session;
     }
 
 
@@ -52,9 +43,9 @@ class Twitter
      * Linkback.
      *
      * @param \Symfony\Component\HttpFoundation\Request $request The current request.
-     *
+     * @return \SimpleSAML\HTTP\RunnableRespone
      */
-    public function linkback(Request $request)
+    public function linkback(Request $request): RunnableResponse
     {
         $authState = $request->query->get('AuthState');
         if ($authState === null) {
