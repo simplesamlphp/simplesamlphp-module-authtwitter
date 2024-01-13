@@ -8,10 +8,9 @@ use Exception;
 use SimpleSAML\Auth;
 use SimpleSAML\Configuration;
 use SimpleSAML\Error;
-use SimpleSAML\HTTP\RunnableResponse;
 use SimpleSAML\Module\authtwitter\Auth\Source\Twitter as TwitterSource;
 use SimpleSAML\Session;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\{Request, StreamedResponse};
 
 /**
  * Controller class for the authtwitter module.
@@ -43,9 +42,9 @@ class Twitter
      * Linkback.
      *
      * @param \Symfony\Component\HttpFoundation\Request $request The current request.
-     * @return \SimpleSAML\HTTP\RunnableRespone
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
-    public function linkback(Request $request): RunnableResponse
+    public function linkback(Request $request): StreamedResponse
     {
         $authState = $request->query->get('AuthState');
         if ($authState === null) {
@@ -81,6 +80,10 @@ class Twitter
             );
         }
 
-        return new RunnableResponse([Auth\Source::class, 'completeAuth'], [&$state]);
+        return new StreamedResponse(
+            function () use (&$state): never {
+                Auth\Source::completeAuth($state);
+            }
+        );
     }
 }

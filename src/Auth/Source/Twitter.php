@@ -80,7 +80,7 @@ class Twitter extends Auth\Source
      *
      * @param array &$state  Information about the current authentication.
      */
-    private function temporaryCredentials(array &$state): void
+    private function temporaryCredentials(array &$state): never
     {
         // We are going to need the authId in order to retrieve this authentication source later
         $state[self::AUTHID] = $this->authId;
