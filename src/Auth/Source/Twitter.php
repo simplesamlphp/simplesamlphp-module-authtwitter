@@ -5,13 +5,10 @@ declare(strict_types=1);
 namespace SimpleSAML\Module\authtwitter\Auth\Source;
 
 use League\OAuth1\Client\Server\Twitter as TwitterServer;
-use SimpleSAML\Assert\Assert;
 use SimpleSAML\Auth;
 use SimpleSAML\Configuration;
 use SimpleSAML\Error;
-use SimpleSAML\Logger;
 use SimpleSAML\Module;
-use SimpleSAML\Utils;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
