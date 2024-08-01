@@ -33,7 +33,7 @@ class Twitter
      */
     public function __construct(
         protected Configuration $config,
-        protected Session $session
+        protected Session $session,
     ) {
     }
 
@@ -65,7 +65,7 @@ class Twitter
 
         if ($source === null) {
             throw new Error\BadRequest(
-                'Could not find authentication source with id ' . var_export($sourceId, true)
+                'Could not find authentication source with id ' . var_export($sourceId, true),
             );
         }
 
@@ -76,14 +76,14 @@ class Twitter
         } catch (Exception $e) {
             Auth\State::throwException(
                 $state,
-                new Error\AuthSource($sourceId, 'Error on authtwitter linkback endpoint.', $e)
+                new Error\AuthSource($sourceId, 'Error on authtwitter linkback endpoint.', $e),
             );
         }
 
         return new StreamedResponse(
             function () use (&$state): never {
                 Auth\Source::completeAuth($state);
-            }
+            },
         );
     }
 }

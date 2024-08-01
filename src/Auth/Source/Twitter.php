@@ -54,7 +54,7 @@ class Twitter extends Auth\Source
 
         $configObject = Configuration::loadFromArray(
             $config,
-            'authsources[' . var_export($this->authId, true) . ']'
+            'authsources[' . var_export($this->authId, true) . ']',
         );
 
         $this->key = $configObject->getString('key');
@@ -94,7 +94,7 @@ class Twitter extends Auth\Source
                 'callback_uri' => Module::getModuleURL('authtwitter/linkback')
                     . '?AuthState=' . $stateId . '&force_login=' . strval($this->force_login),
                 'scope' => $this->scope,
-            ]
+            ],
         );
 
         // First part of OAuth 1.0 authentication is retrieving temporary credentials.
@@ -135,13 +135,13 @@ class Twitter extends Auth\Source
             [
                 'identifier' => $this->key,
                 'secret' => $this->secret,
-            ]
+            ],
         );
 
         $tokenCredentials = $server->getTokenCredentials(
             $requestToken,
             $request->query->get('oauth_token'),
-            $request->query->get('oauth_verifier')
+            $request->query->get('oauth_verifier'),
         );
 
         $state['token_credentials'] = serialize($tokenCredentials);
