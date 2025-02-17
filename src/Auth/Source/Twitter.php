@@ -44,8 +44,8 @@ class Twitter extends Auth\Source
     /**
      * Constructor for this authentication source.
      *
-     * @param array $info  Information about this authentication source.
-     * @param array $config  Configuration.
+     * @param array<mixed> $info  Information about this authentication source.
+     * @param array<mixed> $config  Configuration.
      */
     public function __construct(array $info, array $config)
     {
@@ -67,7 +67,7 @@ class Twitter extends Auth\Source
     /**
      * Log-in using Twitter platform
      *
-     * @param array &$state  Information about the current authentication.
+     * @param array<mixed> &$state  Information about the current authentication.
      */
     public function authenticate(array &$state): void
     {
@@ -78,7 +78,7 @@ class Twitter extends Auth\Source
     /**
      * Retrieve temporary credentials
      *
-     * @param array &$state  Information about the current authentication.
+     * @param array<mixed> &$state  Information about the current authentication.
      */
     private function temporaryCredentials(array &$state): never
     {
@@ -110,7 +110,7 @@ class Twitter extends Auth\Source
 
 
     /**
-     * @param array &$state
+     * @param array<mixed> &$state
      * @param \Symfony\Component\HttpFoundation\Request $request
      */
     public function finalStep(array &$state, Request $request): void

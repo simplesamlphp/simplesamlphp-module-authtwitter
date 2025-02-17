@@ -8,9 +8,10 @@ use Exception;
 use SimpleSAML\Auth;
 use SimpleSAML\Configuration;
 use SimpleSAML\Error;
+use SimpleSAML\HTTP\RunnableResponse;
 use SimpleSAML\Module\authtwitter\Auth\Source\Twitter as TwitterSource;
 use SimpleSAML\Session;
-use Symfony\Component\HttpFoundation\{Request, StreamedResponse};
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Controller class for the authtwitter module.
@@ -42,9 +43,9 @@ class Twitter
      * Linkback.
      *
      * @param \Symfony\Component\HttpFoundation\Request $request The current request.
-     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     * @return \SimpleSAML\HTTP\RunnableResponse
      */
-    public function linkback(Request $request): StreamedResponse
+    public function linkback(Request $request): RunnableResponse
     {
         $authState = $request->query->get('AuthState');
         if ($authState === null) {
@@ -54,7 +55,7 @@ class Twitter
         $state = Auth\State::loadState(base64_decode($authState), TwitterSource::STAGE_INIT);
 
         // Find authentication source
-        if (is_null($state) || !array_key_exists(TwitterSource::AUTHID, $state)) {
+        if (!array_key_exists(TwitterSource::AUTHID, $state)) {
             throw new Error\BadRequest('No data in state for ' . TwitterSource::AUTHID);
         }
 
@@ -80,10 +81,6 @@ class Twitter
             );
         }
 
-        return new StreamedResponse(
-            function () use (&$state): never {
-                Auth\Source::completeAuth($state);
-            },
-        );
+        return new RunnableResponse([Auth\Source::class, 'completeAuth'], [$state]);
     }
 }
