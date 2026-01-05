@@ -22,24 +22,22 @@ class Twitter extends Auth\Source
     /**
      * The string used to identify our states.
      */
-    public const STAGE_INIT = 'twitter:init';
+    public const string STAGE_INIT = 'twitter:init';
 
     /**
      * The key of the AuthId field in the state.
      */
-    public const AUTHID = 'twitter:AuthId';
+    public const string AUTHID = 'twitter:AuthId';
 
-    /** @var string */
+
     private string $key;
 
-    /** @var string */
     private string $secret;
 
-    /** @var string */
     private string $scope;
 
-    /** @var bool */
     private bool $force_login;
+
 
     /**
      * Constructor for this authentication source.
